@@ -12,7 +12,7 @@ import state.StateRunner
 
 @MenuMarker
 class Menu(val name: String, val gateway: Gateway = AfricasTalking) {
-    val startStateName = "START"
+    val startStateName = "__START__"
     val states = mutableMapOf<String, State>()
     val session = mutableMapOf<String, String>()
 
