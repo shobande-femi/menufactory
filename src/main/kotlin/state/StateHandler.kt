@@ -1,6 +1,5 @@
 package state
 
-import exceptions.CannotMapTransitions
 import exceptions.NoStateRunner
 import gateway.Request
 
@@ -39,14 +38,19 @@ class StateHandler(val stateName: String, val stateRunner: StateRunner) {
         transitions[this] = stateName
     }
 
-    infix fun String.to(stateEnum: Enum<*>) {
+    infix fun String.to_(stateEnum: Enum<*>) {
         transitions[this] = stateEnum.name
     }
 
+    infix fun String.to(stateResolver: () -> String) {
+        transitions[this] = stateResolver()
+    }
+
     /**
-     * Kotlin's compile doesn't recognize the receiver's return type as part of this method's signature
+     * Appending an underscore to this method is a hack. Here's the reasoning.
      *
-     * Hence, having following 2 methods would throw an error
+     * Kotlin's compiler doesn't recognize the receiver's return type as part of this method's signature.
+     * The following 2 methods result in the exact same signature, leading to a compile time error.
      *
      * infix fun String.to(stateResolver: () -> String) {
      *     transitions[this] = stateResolver()
@@ -55,18 +59,12 @@ class StateHandler(val stateName: String, val stateRunner: StateRunner) {
      * infix fun String.to(stateResolver: () -> Enum<*>) {
      *     transitions[this] = stateResolver().name
      * }
+     *
+     * This should be solved from Kotlin 1.4
+     *
+     * For uniformity, every transition mapping method that accepts enumerations have an appended underscore
      */
-    inline infix fun <reified T> String.to(stateResolver: () -> T) {
-        when (T::class) {
-            String::class -> {
-                transitions[this] = stateResolver() as String
-            }
-            Enum::class -> {
-                transitions[this] = (stateResolver() as Enum<*>).name
-            }
-            else -> {
-                throw CannotMapTransitions("Cannot map transitions. Please ensure that destination is of type $String or $Enum")
-            }
-        }
+    infix fun String.to_(stateResolver: () -> Enum<*>) {
+        transitions[this] = stateResolver().name
     }
 }
