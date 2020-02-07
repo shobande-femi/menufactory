@@ -84,7 +84,7 @@ enum class States {
     CONTACT_US
 }
 
-fun fetchBalance(): Int = 100
+suspend fun fetchBalance(): Int = 100
 ```
 
 ### Instantiation
