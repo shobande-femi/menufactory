@@ -12,7 +12,7 @@ repositories {
         url "https://maven.pkg.github.com/shobande-femi/ussd-menu-builder"
         credentials {
             username "shobande-femi"
-            password "8285e6e4bd0e4db7925923d8467fcf1024b144ec"
+            password "*********"
         }
     }
 }
@@ -21,6 +21,7 @@ dependencies {
     compile("com.shobande:ussd-menu-builder:1.0.2")
 }
 ```
+Hit me up, and I'll send you the password.
 
 
 #### Sample Usage
