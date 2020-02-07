@@ -1,6 +1,9 @@
 # ussd-menu-builder
 Build your USSD app as a state machine
 
+Major credit to [Habbes](https://github.com/habbes/ussd-menu-builder) for
+inspiring this project. 
+
 This library is still in experimental state, however feel free to try it out.
 
 Install by adding this to your `build.gradle`.
