@@ -5,7 +5,7 @@ This library is still in experimental state, however feel free to try it out.
 
 Install by adding this to your `build.gradle`.
 
-##### Gradle:
+#### Gradle:
 ```groovy
 repositories {
     maven {
@@ -24,7 +24,7 @@ dependencies {
 Hit me up, and I'll send you the password.
 
 
-#### Sample Usage
+## Sample Usage
 ```kotlin
 suspend fun buildMenu(): Menu {
     return Menu.menu("Mystery App", HubTel) {
@@ -84,10 +84,10 @@ enum class States {
 fun fetchBalance(): Int = 100
 ```
 
-##### Instantiation
+### Instantiation
 You can build your menu as shown above or create a singleton `Menu`, 
 the subsequently adding states
-###### Example
+##### Example
 ```kotlin
 menu = Menu("Mystery App", HubTel)
 
@@ -98,7 +98,7 @@ menu.state("contactUs") {
 }
 ```
 
-##### Gateway
+### Gateway
 Currently supported gateways are
 * Africas Talking
 * Hubtel
@@ -111,7 +111,7 @@ In this example, I have chose HubTel as the gateway.
 
 If you need help look through the source code to see how others were implemented.
 
-##### State Runner
+### State Runner
 The run method describes what this state displays to the user.
 `con` responds to the user without ending the USSD session
 `end` responds and ends the USSD session
@@ -123,7 +123,7 @@ The request object contains 'phoneNumber', 'sessionId', 'serviceCode',
 If you need user display prettified, simply use triple quotes and
 `trimMargin()` as seen in the example above.
 
-##### Transition Definitions
+### Transition Definitions
 Transitions map the user input to the name of the next state.
 The name of the next state can be a plain old string, an enumeration or
 a lambda that returns a string/enumeration. I suggest always using
@@ -140,7 +140,7 @@ When user input cannot be matched with any transition definition, the
 state remains the same. You can also define a custom `defaultNextState`
 
 
-#### Serve Requests
+## Serve Requests
 Now we are ready to deploy our USSD app.
 Feel free to use what ever mechanism to serve http requests.
 For simplicity, I use Ktor in this example.
