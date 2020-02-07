@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.shobande"
-version = "1.0.0"
+version = "1.0.2"
 
 repositories {
     mavenCentral()
@@ -12,6 +12,11 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
+}
+
+val sourcesJar by tasks.creating(Jar::class) {
+    archiveClassifier.set("sources")
+    from(sourceSets["main"].allSource)
 }
 
 tasks {
@@ -37,6 +42,7 @@ publishing {
     publications {
         register("jar", MavenPublication::class) {
             from(components["java"])
+            artifact(sourcesJar)
         }
     }
 }
