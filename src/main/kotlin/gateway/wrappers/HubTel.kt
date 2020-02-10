@@ -35,7 +35,7 @@ object HubTel : Gateway {
                 hubTelRequest.Operator
             )
         } catch (e: NoSuchElementException) {
-            throw CannotParseRequest("Request $request doesn't match ${AfricasTalking.name} format because ${e.message}")
+            throw CannotParseRequest("Request $request doesn't match $name format because ${e.message}")
         }
     }
 
