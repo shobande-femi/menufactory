@@ -72,8 +72,7 @@ object HubTel : Gateway {
      */
     override fun transform(request: Any): Request {
         try {
-            val hubTelRequest =
-                HubTelRequest(request as Map<String, String>)
+            val hubTelRequest = HubTelRequest(request as Map<String, String>)
             return Request(
                 hubTelRequest.Mobile,
                 hubTelRequest.SessionId,

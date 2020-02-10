@@ -56,8 +56,7 @@ object Nsano : Gateway {
      */
     override fun transform(request: Any): Request {
         try {
-            val nsanoRequest =
-                NsanoRequest(request as Map<String, String>)
+            val nsanoRequest = NsanoRequest(request as Map<String, String>)
             return Request(
                 nsanoRequest.msisdn,
                 nsanoRequest.msisdn,

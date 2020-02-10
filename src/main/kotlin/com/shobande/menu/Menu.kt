@@ -38,7 +38,7 @@ class Menu(val name: String, val gateway: Gateway = AfricasTalking) {
     }
 
     /**
-     * Registers a state on the USSD com.shobande.menu
+     * Registers a state on the USSD menu
      *
      * @param name state's name
      * @param handler state's handler. The handler houses logic for running a state and handling the state's transitions
@@ -59,17 +59,13 @@ class Menu(val name: String, val gateway: Gateway = AfricasTalking) {
      * @param init state's handler lambda
      */
     private suspend fun initStateHandler(name:String, init: suspend StateHandler.() -> Unit): StateHandler {
-        val stateHandler = StateHandler(
-            name,
-            StateRunner(gateway),
-            StateTransitions(name)
-        )
+        val stateHandler = StateHandler(name, StateRunner(gateway), StateTransitions(name))
         stateHandler.init()
         return stateHandler
     }
 
     /**
-     * Registers a state on the USSD com.shobande.menu
+     * Registers a state on the USSD menu
      *
      * @param name state's name
      * @param handler state's handler. The handler houses logic for running a state and handling the state's transitions
@@ -79,7 +75,7 @@ class Menu(val name: String, val gateway: Gateway = AfricasTalking) {
     suspend fun state(name: String, handler: suspend StateHandler.() -> Unit) = initState(name, handler)
 
     /**
-     * Registers the start state on the USSD com.shobande.menu
+     * Registers the start state on the USSD menu
      *
      * @param handler state's handler. The handler houses logic for running a state and handling the state's transitions
      *
@@ -100,12 +96,12 @@ class Menu(val name: String, val gateway: Gateway = AfricasTalking) {
             states[session[sessionId]] ?: throw StateNotFound("Cannot find state with name: ${session[sessionId]}")
         } else {
             session[sessionId] = startStateName
-            states[startStateName] ?: throw NoStartState("No start state has been configure for $name com.shobande.menu")
+            states[startStateName] ?: throw NoStartState("No start state has been configure for $name menu")
         }
     }
 
     /**
-     * This is the entry point for the USSD com.shobande.menu. Requests from gateways are processed here.
+     * This is the entry point for the USSD menu. Requests from gateways are processed here.
      * Firstly, the request is marshalled to the format specified by the chosen [gateway]
      * Then the session ID is used to fetch the user's last visited state.
      * The transitions defined in the handler of the last visited state is used to determine the next state.
