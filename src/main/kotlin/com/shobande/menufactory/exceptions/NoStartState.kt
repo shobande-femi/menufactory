@@ -1,4 +1,4 @@
-package com.shobande.exceptions
+package com.shobande.menufactory.exceptions
 
 import java.lang.Exception
 

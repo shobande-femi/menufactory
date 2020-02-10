@@ -1,6 +1,6 @@
-package com.shobande.gateway
+package com.shobande.menufactory.gateway
 
-import com.shobande.exceptions.CannotParseRequest
+import com.shobande.menufactory.exceptions.CannotParseRequest
 
 interface Gateway {
 

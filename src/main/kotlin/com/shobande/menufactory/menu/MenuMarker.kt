@@ -1,4 +1,4 @@
-package com.shobande.menu
+package com.shobande.menufactory.menu
 
 @DslMarker
 annotation class MenuMarker

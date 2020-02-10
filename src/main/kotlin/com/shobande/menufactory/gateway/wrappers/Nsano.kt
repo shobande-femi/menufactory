@@ -1,8 +1,8 @@
-package com.shobande.gateway.wrappers
+package com.shobande.menufactory.gateway.wrappers
 
-import com.shobande.exceptions.CannotParseRequest
-import com.shobande.gateway.Gateway
-import com.shobande.gateway.Request
+import com.shobande.menufactory.exceptions.CannotParseRequest
+import com.shobande.menufactory.gateway.Gateway
+import com.shobande.menufactory.gateway.Request
 
 /**
  * Implementation of Nsano's Gateway
@@ -56,7 +56,8 @@ object Nsano : Gateway {
      */
     override fun transform(request: Any): Request {
         try {
-            val nsanoRequest = NsanoRequest(request as Map<String, String>)
+            val nsanoRequest =
+                NsanoRequest(request as Map<String, String>)
             return Request(
                 nsanoRequest.msisdn,
                 nsanoRequest.msisdn,

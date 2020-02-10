@@ -1,4 +1,4 @@
-package com.shobande.gateway
+package com.shobande.menufactory.gateway
 
 /**
  * A standardized request object.

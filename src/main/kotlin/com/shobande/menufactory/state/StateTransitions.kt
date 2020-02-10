@@ -1,6 +1,6 @@
-package com.shobande.state
+package com.shobande.menufactory.state
 
-import com.shobande.gateway.Request
+import com.shobande.menufactory.gateway.Request
 
 /**
  *

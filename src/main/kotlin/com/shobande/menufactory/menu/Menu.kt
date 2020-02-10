@@ -1,14 +1,14 @@
-package com.shobande.menu
+package com.shobande.menufactory.menu
 
-import com.shobande.exceptions.CannotResolveNextState
-import com.shobande.exceptions.NoStartState
-import com.shobande.exceptions.StateNotFound
-import com.shobande.gateway.Gateway
-import com.shobande.gateway.wrappers.AfricasTalking
-import com.shobande.state.State
-import com.shobande.state.StateHandler
-import com.shobande.state.StateRunner
-import com.shobande.state.StateTransitions
+import com.shobande.menufactory.exceptions.CannotResolveNextState
+import com.shobande.menufactory.exceptions.NoStartState
+import com.shobande.menufactory.exceptions.StateNotFound
+import com.shobande.menufactory.gateway.Gateway
+import com.shobande.menufactory.gateway.wrappers.AfricasTalking
+import com.shobande.menufactory.state.State
+import com.shobande.menufactory.state.StateHandler
+import com.shobande.menufactory.state.StateRunner
+import com.shobande.menufactory.state.StateTransitions
 
 /**
  * The USSD Menu
@@ -59,7 +59,11 @@ class Menu(val name: String, val gateway: Gateway = AfricasTalking) {
      * @param init state's handler lambda
      */
     private suspend fun initStateHandler(name:String, init: suspend StateHandler.() -> Unit): StateHandler {
-        val stateHandler = StateHandler(name, StateRunner(gateway), StateTransitions(name))
+        val stateHandler = StateHandler(
+            name,
+            StateRunner(gateway),
+            StateTransitions(name)
+        )
         stateHandler.init()
         return stateHandler
     }

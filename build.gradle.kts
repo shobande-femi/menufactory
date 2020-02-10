@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.shobande"
-version = "1.1.0"
+version = "1.2.0"
 
 repositories {
     mavenCentral()
@@ -32,7 +32,7 @@ publishing {
     repositories {
         maven {
             name = "GithubPackages"
-            url = uri("https://maven.pkg.github.com/shobande-femi/ussd-menu-builder")
+            url = uri("https://maven.pkg.github.com/shobande-femi/menufactory")
             credentials {
                 username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
                 password = project.findProperty("gpr.key") as String? ?: System.getenv("PASSWORD")

@@ -1,4 +1,4 @@
-package com.shobande.state
+package com.shobande.menufactory.state
 
 /**
  * State object

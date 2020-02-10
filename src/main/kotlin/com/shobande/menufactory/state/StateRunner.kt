@@ -1,6 +1,6 @@
-package com.shobande.state
+package com.shobande.menufactory.state
 
-import com.shobande.gateway.Gateway
+import com.shobande.menufactory.gateway.Gateway
 
 /**
  * Houses commands for running a state.

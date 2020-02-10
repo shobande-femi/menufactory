@@ -1,5 +1,5 @@
-# ussd-menu-builder
-Build your USSD app as a state machine
+# Menufactory
+A Kotlin DSL for wiring up your USSD app as a state machine.
 
 Major credit to [Habbes](https://github.com/habbes/ussd-menu-builder) for
 inspiring this project. 
@@ -12,7 +12,7 @@ Install by adding this to your `build.gradle`.
 ```groovy
 repositories {
     maven {
-        url "https://maven.pkg.github.com/shobande-femi/ussd-menu-builder"
+        url "https://maven.pkg.github.com/shobande-femi/menufactory"
         credentials {
             username "shobande-femi"
             password "*********"
@@ -21,7 +21,7 @@ repositories {
 }
 
 dependencies {
-    compile("com.shobande:ussd-menu-builder:1.0.2")
+    compile("com.shobande:menufactory:1.2.0")
 }
 ```
 Hit me up, and I'll send you the password.
@@ -131,9 +131,6 @@ Transitions map the user input to the name of the next state.
 The name of the next state can be a plain old string, an enumeration or
 a lambda that returns a string/enumeration. I suggest always using
 enumeration as they are less prone to errors.
-
-When you map to an enumeration, use `to_` (with an underscore).
-The reason for this is documented [here](https://github.com/shobande-femi/ussd-menu-builder/blob/42f375e6963ca449a123e21a33915c78abeeec26/src/main/kotlin/state/StateHandler.kt#L50)
 
 You can use regular expression for matching inputs to next states.
 You needn't escape any characters in the regex. Simply use triple quotes around the 
