@@ -21,7 +21,7 @@ repositories {
 }
 
 dependencies {
-    compile("com.shobande:menufactory:1.2.0")
+    compile("com.shobande:menufactory:1.0.0")
 }
 ```
 Hit me up, and I'll send you the password.
