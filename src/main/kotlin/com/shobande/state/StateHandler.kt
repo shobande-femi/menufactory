@@ -28,16 +28,30 @@ class StateHandler(private val stateName: String, private val stateRunner: State
     }
 
     /**
-     * Simply invokes the state's previously registered runner
+     * Simply invokes the state's previously registered runner.
+     * Redirects to another state if the runner returns a [State] object
      *
      * @param request [Request] object
      *
      * @throws [NoStateRunner] when no runner has been registered
      *
      */
-    suspend fun handle(request: Request): Any {
+    suspend fun handle(request: Request, session: MutableMap<String, String>): Any {
         if (::runner.isInitialized) {
-            return stateRunner.runner(request)
+
+            // some sort of recursive call to handle state redirection
+            // goTo returns a state object
+            // hence if the return value of the state runner is of type state, we know we are redirecting to another state
+            // call the target state's runner
+            return when(val result = stateRunner.runner(request)) {
+                is State -> {
+                    result.handler.handle(request, session)
+                }
+                else -> {
+                    session[request.sessionId] = stateName
+                    result
+                }
+            }
         } else {
             throw NoStateRunner("No runner has been configured for $stateName state")
         }

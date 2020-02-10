@@ -21,14 +21,14 @@ import com.shobande.state.StateTransitions
  * @property session map of sessions IDs to last visited state
  */
 @MenuMarker
-class Menu(private val name: String, val gateway: Gateway = AfricasTalking) {
+class Menu(val name: String, val gateway: Gateway = AfricasTalking) {
     private val startStateName = "__START__"
     private val states = mutableMapOf<String, State>()
     private val session = mutableMapOf<String, String>()
 
     companion object {
         /**
-         * todo
+         * Menu Factory
          */
         suspend fun menu(name: String, gateway: Gateway = AfricasTalking, init: suspend Menu.() -> Unit): Menu {
             val menu = Menu(name, gateway = gateway)
@@ -117,9 +117,25 @@ class Menu(private val name: String, val gateway: Gateway = AfricasTalking) {
         val currentState = states[previousState.handler.stateTransitions.nextState(transformedRequest)]
             ?: throw CannotResolveNextState("${previousState.name} state cannot resolve next state for input ${transformedRequest.message}")
 
-        session[transformedRequest.sessionId] = currentState.name
-
-        val result = currentState.handler.handle(transformedRequest)
+        val result = currentState.handler.handle(transformedRequest, session)
         responder(result)
     }
+
+    /**
+     * Redirect to another state
+     *
+     * @param stateName target state's name
+     *
+     * @return target [State] object
+     */
+    fun goTo(stateName: String): State {
+        return states[stateName] ?: throw StateNotFound("Cannot find state with name: $stateName")
+    }
+
+    /**
+     * Redirect to start state
+     *
+     * @return start [State] object
+     */
+    fun goToStart() = goTo(startStateName)
 }

@@ -67,7 +67,7 @@ suspend fun buildMenu(): Menu {
             transitions {
                 """^[0-9]*$""" to "selectNetworkProvider"
             }
-            defaultNextState(startStateName)
+            defaultNextState(States.CONTACT_US.name)
         }
 
         state(States.CONTACT_US.name) {
