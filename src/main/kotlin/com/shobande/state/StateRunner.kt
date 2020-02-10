@@ -9,7 +9,7 @@ import com.shobande.gateway.Gateway
  * @param gateway Specifies the gateway implementation to be used for parsing and responding to requests.
  */
 @StateMarker
-class StateRunner(val gateway: Gateway) {
+class StateRunner(private val gateway: Gateway) {
 
     /**
      * Sends a response without ending the current user session

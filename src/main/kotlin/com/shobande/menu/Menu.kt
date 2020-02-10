@@ -21,8 +21,8 @@ import com.shobande.state.StateTransitions
  * @property session map of sessions IDs to last visited state
  */
 @MenuMarker
-class Menu(val name: String, val gateway: Gateway = AfricasTalking) {
-    val startStateName = "__START__"
+class Menu(private val name: String, val gateway: Gateway = AfricasTalking) {
+    private val startStateName = "__START__"
     private val states = mutableMapOf<String, State>()
     private val session = mutableMapOf<String, String>()
 
