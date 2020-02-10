@@ -1,6 +1,6 @@
-package gateway
+package com.shobande.gateway
 
-import exceptions.CannotParseRequest
+import com.shobande.exceptions.CannotParseRequest
 
 interface Gateway {
 

@@ -1,8 +1,8 @@
-package gateway.wrappers
+package com.shobande.gateway.wrappers
 
-import exceptions.CannotParseRequest
-import gateway.Gateway
-import gateway.Request
+import com.shobande.exceptions.CannotParseRequest
+import com.shobande.gateway.Gateway
+import com.shobande.gateway.Request
 
 /**
  * Implementation of Hubtel's Gateway
@@ -72,7 +72,8 @@ object HubTel : Gateway {
      */
     override fun transform(request: Any): Request {
         try {
-            val hubTelRequest = HubTelRequest(request as Map<String, String>)
+            val hubTelRequest =
+                HubTelRequest(request as Map<String, String>)
             return Request(
                 hubTelRequest.Mobile,
                 hubTelRequest.SessionId,

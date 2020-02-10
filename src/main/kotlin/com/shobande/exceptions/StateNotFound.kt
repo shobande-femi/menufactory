@@ -1,4 +1,4 @@
-package exceptions
+package com.shobande.exceptions
 
 import java.lang.Exception
 

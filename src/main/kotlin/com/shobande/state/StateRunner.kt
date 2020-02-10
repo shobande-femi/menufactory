@@ -1,6 +1,6 @@
-package state
+package com.shobande.state
 
-import gateway.Gateway
+import com.shobande.gateway.Gateway
 
 /**
  * Houses commands for running a state.

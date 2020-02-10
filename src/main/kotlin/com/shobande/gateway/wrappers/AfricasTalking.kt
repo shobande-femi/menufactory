@@ -1,8 +1,8 @@
-package gateway.wrappers
+package com.shobande.gateway.wrappers
 
-import exceptions.CannotParseRequest
-import gateway.Gateway
-import gateway.Request
+import com.shobande.exceptions.CannotParseRequest
+import com.shobande.gateway.Gateway
+import com.shobande.gateway.Request
 
 /**
  * Implementation of Africa's Talking Gateway
@@ -21,7 +21,7 @@ object AfricasTalking: Gateway {
      * @property serviceCode your app's USSD code
      * @property text user input. When the user first dials your USSD code, [text] is an empty string.
      * Subsequently, it concatenates all the user input within the session with a * until the session ends.
-     * Example: "1*2" means the user's input into the previous menu was "1", while the input into the current menu is "2"
+     * Example: "1*2" means the user's input into the previous com.shobande.menu was "1", while the input into the current com.shobande.menu is "2"
      * @property networkCode mobile operator of the phoneNumber interacting with your ussd app
      */
     data class AfricasTalkingRequest(val map: Map<String, String>) {
@@ -48,12 +48,15 @@ object AfricasTalking: Gateway {
      */
     override fun transform(request: Any): Request {
         try {
-            val africasTalkingRequest = AfricasTalkingRequest(request as Map<String, String>)
+            val africasTalkingRequest =
+                AfricasTalkingRequest(request as Map<String, String>)
             return Request(
                 africasTalkingRequest.phoneNumber,
                 africasTalkingRequest.sessionId,
                 africasTalkingRequest.serviceCode,
-                if (africasTalkingRequest.text.isEmpty()) africasTalkingRequest.text else africasTalkingRequest.text.split("*").last(),
+                if (africasTalkingRequest.text.isEmpty()) africasTalkingRequest.text else africasTalkingRequest.text.split(
+                    "*"
+                ).last(),
                 africasTalkingRequest.networkCode
             )
         } catch (e: NoSuchElementException) {

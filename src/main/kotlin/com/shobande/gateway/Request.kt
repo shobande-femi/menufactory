@@ -1,4 +1,4 @@
-package gateway
+package com.shobande.gateway
 
 /**
  * A standardized request object.

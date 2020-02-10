@@ -1,7 +1,7 @@
-package state
+package com.shobande.state
 
-import exceptions.NoStateRunner
-import gateway.Request
+import com.shobande.exceptions.NoStateRunner
+import com.shobande.gateway.Request
 
 /**
  * Houses commands for running a state and handling the state's transitions

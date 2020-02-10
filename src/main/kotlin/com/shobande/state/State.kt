@@ -1,4 +1,4 @@
-package state
+package com.shobande.state
 
 /**
  * State object
