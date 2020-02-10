@@ -13,6 +13,7 @@ object AfricasTalking: Gateway {
         val sessionId by map
         val serviceCode by map
         val text by map
+        val networkCode by map
     }
 
     override fun transform(request: Any): Request {
@@ -22,8 +23,8 @@ object AfricasTalking: Gateway {
                 africasTalkingRequest.phoneNumber,
                 africasTalkingRequest.sessionId,
                 africasTalkingRequest.serviceCode,
-                africasTalkingRequest.text.split("*").last(),
-                null
+                if (africasTalkingRequest.text.isEmpty()) africasTalkingRequest.text else africasTalkingRequest.text.split("*").last(),
+                africasTalkingRequest.networkCode
             )
         } catch (e: NoSuchElementException) {
             throw CannotParseRequest("Request $request doesn't match $name format because ${e.message}")
