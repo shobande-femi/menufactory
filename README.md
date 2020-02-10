@@ -41,26 +41,26 @@ suspend fun buildMenu(): Menu {
             }
 
             transitions {
-                "1" to_ States.CHECK_BALANCE
-                "2" to_ {
-                    if (fetchBalance() <= Int.MAX_VALUE) {
-                        States.BUY_AIRTIME
+                "1" to States.CHECK_BALANCE.name
+                "2" to {
+                    if (it.operator.equals("MTN")) {
+                        States.BUY_AIRTIME.name
                     } else {
-                        States.CONTACT_US
+                        States.CONTACT_US.name
                     }
                 }
-                "3" to_ States.CONTACT_US
-                """^[a-zA-Z]*$""" to_ States.CONTACT_US
+                "3" to States.CONTACT_US.name
+                """^[a-zA-Z]*$""" to States.CONTACT_US.name
             }
         }
 
-        state(States.CHECK_BALANCE) {
+        state(States.CHECK_BALANCE.name) {
             run {
                 end("You balance is ${fetchBalance()}")
             }
         }
 
-        state(States.BUY_AIRTIME) {
+        state(States.BUY_AIRTIME.name) {
             run {
                 con("Enter your phone number")
             }
@@ -70,7 +70,7 @@ suspend fun buildMenu(): Menu {
             defaultNextState(startStateName)
         }
 
-        state(States.CONTACT_US) {
+        state(States.CONTACT_US.name) {
             run {
                 end("You can reach me on Twitter @shobande_femi")
             }
@@ -148,7 +148,6 @@ Now we are ready to deploy our USSD app.
 Feel free to use what ever mechanism to serve http requests.
 For simplicity, I use Ktor in this example.
 ```kotlin
-
 suspend fun main() {
     val menu = buildMenu()
 
@@ -162,7 +161,7 @@ suspend fun main() {
             }
 
             post("/ussd") {
-                menu.run(call.receive()) { call.respond(it) }
+                menu.handle(call.receive()) { call.respond(it) }
             }
         }
     }.start(wait = true)
