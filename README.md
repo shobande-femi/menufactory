@@ -157,7 +157,7 @@ suspend fun main() {
                 }
             }
 
-            post("/ussd") {
+            post("/") {
                 menu.handle(call.receive()) { call.respond(it) }
             }
         }
