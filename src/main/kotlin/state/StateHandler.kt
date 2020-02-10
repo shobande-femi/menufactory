@@ -3,68 +3,61 @@ package state
 import exceptions.NoStateRunner
 import gateway.Request
 
+/**
+ * Houses commands for running a state and handling the state's transitions
+ *
+ * @param stateName state's name
+ * @param stateRunner an instance of [StateRunner]. House commands for running a state
+ * @param stateTransitions an instance of [StateTransitions]. Within this are state transition definitions
+ *
+ * @property runner the state's runner. The return value the runner is what is displayed to the user when this state is visited
+ */
 @StateMarker
-class StateHandler(val stateName: String, val stateRunner: StateRunner) {
-    var defaultNextStateName = stateName
-    val transitions = mutableMapOf<String, String>()
+class StateHandler(private val stateName: String, private val stateRunner: StateRunner, val stateTransitions: StateTransitions) {
     lateinit var runner: suspend StateRunner.(request: Request) -> Any
 
+    /**
+     * Registers a state's runner.
+     * You can think of running a state as determining what the state should display when a user visits the state.
+     * The return value the runner is what is displayed to the user.
+     *
+     * @param runner lambda representing the runner
+     */
     fun run(runner: suspend StateRunner.(request: Request) -> Any) {
         this.runner = runner
     }
 
-    suspend fun run(request: Request): Any {
+    /**
+     * Simply invokes the state's previously registered runner
+     *
+     * @param request [Request] object
+     *
+     * @throws [NoStateRunner] when no runner has been registered
+     *
+     */
+    suspend fun handle(request: Request): Any {
         if (::runner.isInitialized) {
-            return runner(stateRunner, request)
+            return stateRunner.runner(request)
         } else {
             throw NoStateRunner("No runner has been configured for $stateName state")
         }
     }
 
-    fun transitions(mapping: () -> Unit) {
-        mapping()
-    }
-
-    fun defaultNextState(name: String) {
-        defaultNextStateName = name
-    }
-
-    fun nextState(input: String): String {
-        return transitions[input]
-            ?: transitions.getOrDefault(transitions.keys.firstOrNull { input.matches(it.toRegex()) }, defaultNextStateName)
-    }
-
-    infix fun String.to(stateName: String) {
-        transitions[this] = stateName
-    }
-
-    infix fun String.to_(stateEnum: Enum<*>) {
-        transitions[this] = stateEnum.name
-    }
-
-    infix fun String.to(stateResolver: () -> String) {
-        transitions[this] = stateResolver()
+    /**
+     * Registers a state's possible transitions
+     *
+     * @param mapping lambda containing transition mappings
+     */
+    fun transitions(mapping: StateTransitions.() -> Unit) {
+        stateTransitions.mapping()
     }
 
     /**
-     * Appending an underscore to this method is a hack. Here's the reasoning.
+     * Set the default next state
      *
-     * Kotlin's compiler doesn't recognize the receiver's return type as part of this method's signature.
-     * The following 2 methods result in the exact same signature, leading to a compile time error.
-     *
-     * infix fun String.to(stateResolver: () -> String) {
-     *     transitions[this] = stateResolver()
-     * }
-     * AND
-     * infix fun String.to(stateResolver: () -> Enum<*>) {
-     *     transitions[this] = stateResolver().name
-     * }
-     *
-     * This should be solved from Kotlin 1.4
-     *
-     * For uniformity, every transition mapping method that accepts enumerations have an appended underscore
+     * @param name name of the state to default to
      */
-    infix fun String.to_(stateResolver: () -> Enum<*>) {
-        transitions[this] = stateResolver().name
+    fun defaultNextState(name: String) {
+        this.stateTransitions.defaultNextStateName = name
     }
 }

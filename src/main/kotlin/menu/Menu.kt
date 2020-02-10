@@ -3,20 +3,33 @@ package menu
 import exceptions.CannotResolveNextState
 import exceptions.NoStartState
 import exceptions.StateNotFound
-import gateway.wrappers.AfricasTalking
 import gateway.Gateway
-import gateway.Request
+import gateway.wrappers.AfricasTalking
 import state.State
 import state.StateHandler
 import state.StateRunner
+import state.StateTransitions
 
+/**
+ * The USSD Menu
+ *
+ * @param name name our the USSD application
+ * @param gateway specifies the gateway to be used. [AfricasTalking] by default
+ *
+ * @property startStateName name of the start state
+ * @property states map of state names to state objects
+ * @property session map of sessions IDs to last visited state
+ */
 @MenuMarker
 class Menu(val name: String, val gateway: Gateway = AfricasTalking) {
     val startStateName = "__START__"
-    val states = mutableMapOf<String, State>()
-    val session = mutableMapOf<String, String>()
+    private val states = mutableMapOf<String, State>()
+    private val session = mutableMapOf<String, String>()
 
     companion object {
+        /**
+         * todo
+         */
         suspend fun menu(name: String, gateway: Gateway = AfricasTalking, init: suspend Menu.() -> Unit): Menu {
             val menu = Menu(name, gateway = gateway)
             menu.init()
@@ -24,44 +37,89 @@ class Menu(val name: String, val gateway: Gateway = AfricasTalking) {
         }
     }
 
+    /**
+     * Registers a state on the USSD menu
+     *
+     * @param name state's name
+     * @param handler state's handler. The handler houses logic for running a state and handling the state's transitions
+     *
+     * @return the registered state
+     */
     private suspend fun initState(name: String, handler: suspend StateHandler.() -> Unit): State {
         val state = State(name, initStateHandler(name, handler))
         states[state.name] = state
         return state
     }
 
+    /**
+     * Initialize a state's handler.
+     * The handler houses logic for running a state and handling the state's transitions
+     *
+     * @param name name of the state owning the handler
+     * @param init state's handler lambda
+     */
     private suspend fun initStateHandler(name:String, init: suspend StateHandler.() -> Unit): StateHandler {
-        val stateHandler = StateHandler(name, StateRunner(gateway))
+        val stateHandler = StateHandler(name, StateRunner(gateway), StateTransitions(name))
         stateHandler.init()
         return stateHandler
     }
 
+    /**
+     * Registers a state on the USSD menu
+     *
+     * @param name state's name
+     * @param handler state's handler. The handler houses logic for running a state and handling the state's transitions
+     *
+     * @return the registered state
+     */
     suspend fun state(name: String, handler: suspend StateHandler.() -> Unit) = initState(name, handler)
 
-    suspend fun <T : Enum<T>> state(name: Enum<T>, handler: suspend StateHandler.() -> Unit) = initState(name.name, handler)
-
+    /**
+     * Registers the start state on the USSD menu
+     *
+     * @param handler state's handler. The handler houses logic for running a state and handling the state's transitions
+     *
+     * @return the registered state
+     */
     suspend fun startState(handler: suspend StateHandler.() -> Unit) = initState(startStateName, handler)
 
-    private fun previousState(request: Request): State {
-        return if (session.containsKey(request.sessionId)) {
-            states[session[request.sessionId]] ?: throw StateNotFound("Cannot find state with name: ${session[request.sessionId]}")
+    /**
+     * Fetches the user's last visited state from the session.
+     * If no previous state is found for the [sessionId], the start state is returned
+     *
+     * @param sessionId UUID representing the user's current session
+     *
+     * @return the last visited State or start state
+     */
+    private fun previousState(sessionId: String): State {
+        return if (session.containsKey(sessionId)) {
+            states[session[sessionId]] ?: throw StateNotFound("Cannot find state with name: ${session[sessionId]}")
         } else {
-            session[request.sessionId] = startStateName
+            session[sessionId] = startStateName
             states[startStateName] ?: throw NoStartState("No start state has been configure for $name menu")
         }
     }
 
-    suspend fun run(request: Any, responder: suspend (result: Any) -> Any) {
+    /**
+     * This is the entry point for the USSD menu. Requests from gateways are processed here.
+     * Firstly, the request is marshalled to the format specified by the chosen [gateway]
+     * Then the session ID is used to fetch the user's last visited state.
+     * The transitions defined in the handler of the last visited state is used to determine the next state.
+     *
+     * @param request request sent to the USSD app
+     * @param responder lambda used to send a response to the gateway
+     */
+    suspend fun handle(request: Any, responder: suspend (result: Any) -> Any) {
         val transformedRequest = gateway.transform(request)
 
-        val previousState = previousState(transformedRequest)
+        val previousState = previousState(transformedRequest.sessionId)
 
-        val currentState = states[previousState.handler.nextState(transformedRequest.message)]
+        val currentState = states[previousState.handler.stateTransitions.nextState(transformedRequest)]
             ?: throw CannotResolveNextState("${previousState.name} state cannot resolve next state for input ${transformedRequest.message}")
 
         session[transformedRequest.sessionId] = currentState.name
 
-        val result = currentState.handler.run(transformedRequest)
+        val result = currentState.handler.handle(transformedRequest)
         responder(result)
     }
 }
