@@ -184,3 +184,9 @@ suspend fun main() {
     }.start(wait = true)
 }
 ```
+
+The key part to note is `menu.handle`.
+This method takes 2 arguments
+1. The request body
+2. A lambda to be called when the menu has determined the result to be returned. The
+result is fed as an argument into the lambda.
