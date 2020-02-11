@@ -56,7 +56,11 @@ suspend fun buildMenu(): Menu {
 
         state(States.CHECK_BALANCE.name) {
             run {
-                end("You balance is ${fetchBalance()}")
+                if (it.phoneNumber.length != 13) {
+                    goTo(States.CONTACT_US.name)
+                } else {
+                    end("You balance is ${fetchBalance()}")
+                }
             }
         }
 
@@ -122,6 +126,9 @@ Within the run method, you have access to the full request object.
 To get the user's phone number simply do `it.phoneNumber`.
 The request object contains 'phoneNumber', 'sessionId', 'serviceCode',
 'message' and 'operator'.
+
+Within a state's run, it possible to redirect to another state using `goTo`.
+To redirect to the start state, you can use `goToStart`
 
 If you need user display prettified, simply use triple quotes and
 `trimMargin()` as seen in the example above.
