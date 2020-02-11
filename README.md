@@ -126,6 +126,17 @@ To get the user's phone number simply do `it.phoneNumber`.
 The request object contains 'phoneNumber', 'sessionId', 'serviceCode',
 'message' and 'operator'.
 
+Here's the full request object:
+```kotlin
+data class Request(
+    val phoneNumber: String,
+    val sessionId: String,
+    val ussdCode: String?,
+    val message: String,
+    val operator: String?
+)
+```
+
 Within a state's run, it possible to redirect to another state using `goTo`.
 To redirect to the start state, you can use `goToStart`
 
@@ -134,9 +145,12 @@ If you need user display prettified, simply use triple quotes and
 
 ### Transition Definitions
 Transitions map the user input to the name of the next state.
-The name of the next state can be a plain old string, an enumeration or
-a lambda that returns a string/enumeration. I suggest always using
-enumeration as they are less prone to errors.
+The mapped value (next state) may be a string or a lambda that 
+returns a string.
+When using a lambda, the request object is accessible; `it.phoneNumber`.
+
+**Note**: I have used enumerations for state names to avoid errors that may arise from
+typos. When using enumerations, remember to retrieve the enum's `name`.
 
 You can use regular expression for matching inputs to next states.
 You needn't escape any characters in the regex. Simply use triple quotes around the 
