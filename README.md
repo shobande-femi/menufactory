@@ -24,8 +24,7 @@ dependencies {
     compile("com.shobande:menufactory:1.0.0")
 }
 ```
-Hit me up, and I'll send you the password.
-
+Find the repo password [here](https://drive.google.com/open?id=10yNyLXmrp5iwl8UFhi5crtRtdgLHOg7b)
 
 ## Sample Usage
 ```kotlin
