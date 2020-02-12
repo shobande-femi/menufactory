@@ -64,9 +64,12 @@ suspend fun buildMenu(): Menu {
 
         state(States.BUY_AIRTIME.name) {
             run {
-                con("Enter your phone number")
+                con("""Enter your phone number
+                    |0. Go back
+                """.trimMargin())
             }
             transitions {
+                "0" to this@menu.startStateName
                 """^[0-9]*$""" to "airtimeBought"
                 """^[a-zA-Z]*$""" to States.CONTACT_US.name
             }

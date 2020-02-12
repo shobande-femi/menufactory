@@ -22,7 +22,7 @@ import com.shobande.menufactory.state.StateTransitions
  */
 @MenuMarker
 class Menu(val name: String, val gateway: Gateway = AfricasTalking) {
-    private val startStateName = "__START__"
+    val startStateName = "__START__"
     private val states = mutableMapOf<String, State>()
     private val session = mutableMapOf<String, String>()
 
