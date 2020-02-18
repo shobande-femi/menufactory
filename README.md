@@ -147,7 +147,10 @@ data class Request(
 ```
 
 Within a state's run, it possible to redirect to another state using `goTo`.
-To redirect to the start state, you can use `goToStart`
+To redirect to the start state, you can use `goToStart`.
+Redirecting to another state doesn't break the state chain, hence, you
+may redirect as many times as you wish.
+Like redirecting to a state which redirects to another state and so on.
 
 If you need user display prettified, simply use triple quotes and
 `trimMargin()` as seen in the example above.
