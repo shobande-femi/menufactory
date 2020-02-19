@@ -1,10 +1,12 @@
 package com.shobande.menufactory.menu
 
 import com.shobande.menufactory.exceptions.CannotResolveNextState
-import com.shobande.menufactory.exceptions.NoStartState
+import com.shobande.menufactory.exceptions.ReservedStateName
 import com.shobande.menufactory.exceptions.StateNotFound
 import com.shobande.menufactory.gateway.Gateway
 import com.shobande.menufactory.gateway.wrappers.AfricasTalking
+import com.shobande.menufactory.session.Session
+import com.shobande.menufactory.session.wrappers.InMemorySession
 import com.shobande.menufactory.state.State
 import com.shobande.menufactory.state.StateHandler
 import com.shobande.menufactory.state.StateRunner
@@ -15,16 +17,13 @@ import com.shobande.menufactory.state.StateTransitions
  *
  * @param name name our the USSD application
  * @param gateway specifies the gateway to be used. [AfricasTalking] by default
+ * @param session implementation of [Session] for storing and retrieving information for the current session
  *
- * @property startStateName name of the start state
  * @property states map of state names to state objects
- * @property session map of sessions IDs to last visited state
  */
 @MenuMarker
-class Menu(val name: String, val gateway: Gateway = AfricasTalking) {
-    val startStateName = "__START__"
+class Menu(val name: String, val gateway: Gateway = AfricasTalking, val session: Session = InMemorySession()) {
     private val states = mutableMapOf<String, State>()
-    private val session = mutableMapOf<String, String>()
 
     companion object {
         /**
@@ -59,11 +58,7 @@ class Menu(val name: String, val gateway: Gateway = AfricasTalking) {
      * @param init state's handler lambda
      */
     private suspend fun initStateHandler(name:String, init: suspend StateHandler.() -> Unit): StateHandler {
-        val stateHandler = StateHandler(
-            name,
-            StateRunner(gateway),
-            StateTransitions(name)
-        )
+        val stateHandler = StateHandler(name, StateRunner(gateway), StateTransitions(name))
         stateHandler.init()
         return stateHandler
     }
@@ -76,7 +71,10 @@ class Menu(val name: String, val gateway: Gateway = AfricasTalking) {
      *
      * @return the registered state
      */
-    suspend fun state(name: String, handler: suspend StateHandler.() -> Unit) = initState(name, handler)
+    suspend fun state(name: String, handler: suspend StateHandler.() -> Unit) {
+        if (name == session.startStateName) throw ReservedStateName("state name $name is reserved for internal use only")
+        initState(name, handler)
+    }
 
     /**
      * Registers the start state on the USSD menu
@@ -85,7 +83,7 @@ class Menu(val name: String, val gateway: Gateway = AfricasTalking) {
      *
      * @return the registered state
      */
-    suspend fun startState(handler: suspend StateHandler.() -> Unit) = initState(startStateName, handler)
+    suspend fun startState(handler: suspend StateHandler.() -> Unit) = initState(session.startStateName, handler)
 
     /**
      * Fetches the user's last visited state from the session.
@@ -96,12 +94,8 @@ class Menu(val name: String, val gateway: Gateway = AfricasTalking) {
      * @return the last visited State or start state
      */
     private fun previousState(sessionId: String): State {
-        return if (session.containsKey(sessionId)) {
-            states[session[sessionId]] ?: throw StateNotFound("Cannot find state with name: ${session[sessionId]}")
-        } else {
-            session[sessionId] = startStateName
-            states[startStateName] ?: throw NoStartState("No start state has been configure for $name menu")
-        }
+        val previousStateName = session.getPreviousStateName(sessionId)
+        return states[previousStateName] ?: throw StateNotFound("Cannot find state with name: $previousStateName")
     }
 
     /**
@@ -109,6 +103,18 @@ class Menu(val name: String, val gateway: Gateway = AfricasTalking) {
      * Firstly, the request is marshalled to the format specified by the chosen [gateway]
      * Then the session ID is used to fetch the user's last visited state.
      * The transitions defined in the handler of the last visited state is used to determine the next state.
+     *
+     * At the start of a user session, there is not previous state, hence the start state is returned as the previous state.
+     * The start state then tries to handle the transition, but since the user input would be an empty string
+     * or the ussd code (depending on the gateway), no matching transition would be found (as long as you have not
+     * defined a transition on the start state that matches the user input provided by the gateway).
+     * Hence, it will transition to the default next state. If the default next state has not been overridden,
+     * the state will default to itself.
+     * This may seem like an overkill, and it may be worth considering some circuit breaker pattern where on start of
+     * ussd session, if the user input is an empty string or the ussd code, then return the start state.
+     * At the moment, I have chosen not to do this because different gateways may have different values set as the input
+     * on start of the ussd session. Some gateways use an empty string, some use the ussd code, others even use the ussd
+     * code without the leading asterisk (*). The options are endless.
      *
      * @param request request sent to the USSD app
      * @param responder lambda used to send a response to the gateway
@@ -141,5 +147,5 @@ class Menu(val name: String, val gateway: Gateway = AfricasTalking) {
      *
      * @return start [State] object
      */
-    fun goToStart() = goTo(startStateName)
+    fun goToStart() = goTo(session.startStateName)
 }

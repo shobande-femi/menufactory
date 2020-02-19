@@ -2,6 +2,7 @@ package com.shobande.menufactory.state
 
 import com.shobande.menufactory.exceptions.NoStateRunner
 import com.shobande.menufactory.gateway.Request
+import com.shobande.menufactory.session.Session
 
 /**
  * Houses commands for running a state and handling the state's transitions
@@ -32,11 +33,12 @@ class StateHandler(private val stateName: String, private val stateRunner: State
      * Redirects to another state if the runner returns a [State] object
      *
      * @param request [Request] object
+     * @param session session handler for storing and retrieving information
      *
      * @throws [NoStateRunner] when no runner has been registered
      *
      */
-    suspend fun handle(request: Request, session: MutableMap<String, String>): Any {
+    suspend fun handle(request: Request, session: Session): Any {
         if (::runner.isInitialized) {
 
             // some sort of recursive call to handle state redirection
@@ -48,7 +50,7 @@ class StateHandler(private val stateName: String, private val stateRunner: State
                     result.handler.handle(request, session)
                 }
                 else -> {
-                    session[request.sessionId] = stateName
+                    session.setPreviousStateName(request.sessionId, stateName)
                     result
                 }
             }
