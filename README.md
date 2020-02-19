@@ -21,7 +21,7 @@ repositories {
 }
 
 dependencies {
-    compile("com.shobande:menufactory:1.0.1")
+    compile("com.shobande:menufactory:1.1.0")
 }
 ```
 Find the repo password [here](https://drive.google.com/open?id=10yNyLXmrp5iwl8UFhi5crtRtdgLHOg7b)
