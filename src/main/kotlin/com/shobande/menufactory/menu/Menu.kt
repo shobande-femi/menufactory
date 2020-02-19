@@ -71,9 +71,9 @@ class Menu(val name: String, val gateway: Gateway = AfricasTalking, val session:
      *
      * @return the registered state
      */
-    suspend fun state(name: String, handler: suspend StateHandler.() -> Unit) {
+    suspend fun state(name: String, handler: suspend StateHandler.() -> Unit): State {
         if (name == session.startStateName) throw ReservedStateName("state name $name is reserved for internal use only")
-        initState(name, handler)
+        return initState(name, handler)
     }
 
     /**

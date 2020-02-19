@@ -15,7 +15,7 @@ import com.shobande.menufactory.session.Session
  * @property runner the state's runner. The return value the runner is what is displayed to the user when this state is visited
  */
 @StateMarker
-class StateHandler(private val stateName: String, private val stateRunner: StateRunner, val stateTransitions: StateTransitions) {
+class StateHandler(val stateName: String, private val stateRunner: StateRunner, val stateTransitions: StateTransitions) {
     lateinit var runner: suspend StateRunner.(request: Request) -> Any
 
     /**
