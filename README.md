@@ -105,7 +105,7 @@ suspend fun fetchBalance(): Int = 100
 
 ### Instantiation
 You can build your menu as shown above or create a singleton `Menu`, 
-the subsequently adding states
+then subsequently adding states
 ##### Example
 ```kotlin
 menu = Menu("Mystery App", HubTel, InMemorySession())
