@@ -27,6 +27,7 @@ dependencies {
 Find the repo password [here](https://drive.google.com/open?id=10yNyLXmrp5iwl8UFhi5crtRtdgLHOg7b)
 
 ## Sample Usage
+Checkout the full Sample app [here](https://github.com/shobande-femi/test-ussd-app)
 ```kotlin
 suspend fun buildMenu(): Menu {
     return Menu.menu("Mystery App", HubTel, InMemorySession()) {
