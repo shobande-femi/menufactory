@@ -1,6 +1,7 @@
 package com.shobande.menufactory.state
 
 import com.shobande.menufactory.exceptions.NoStateRunner
+import com.shobande.menufactory.exceptions.NoTerminatorInStateRunner
 import com.shobande.menufactory.gateway.Request
 import com.shobande.menufactory.session.Session
 
@@ -35,23 +36,35 @@ class StateHandler(private val stateName: String, private val stateRunner: State
      * @param request [Request] object
      * @param session session handler for storing and retrieving information
      *
-     * @throws [NoStateRunner] when no runner has been registered
+     * @return a wrapper around the actual response and a boolean signifying if the calling state is a final state or not.
      *
+     * @throws
+     * [NoTerminatorInStateRunner] when a state runner is defined but doesn't end with a call to any of:
+     * `con`, `end`, `goTo` or `goToStart`
+     * [NoStateRunner] when no runner has been registered
      */
-    suspend fun handle(request: Request, session: Session): Any {
+    suspend fun handle(request: Request, session: Session): ResultWrapper {
+
         if (::runner.isInitialized) {
 
-            // some sort of recursive call to handle state redirection
-            // goTo returns a state object
-            // hence if the return value of the state runner is of type state, we know we are redirecting to another state
-            // call the target state's runner
             return when(val result = stateRunner.runner(request)) {
+
+                // if the return value is a Result wrapper, we know that con or end was called, hence return that result
+                is ResultWrapper -> {
+                    session.setPreviousStateName(request.sessionId, stateName)
+                    result
+                }
+
+                // some sort of recursive call to handle state redirection
+                // goTo returns a state object
+                // hence if the return value of the state runner is of type state, we know we are redirecting to another state
+                // call the target state's runner
                 is State -> {
                     result.handler.handle(request, session)
                 }
+
                 else -> {
-                    session.setPreviousStateName(request.sessionId, stateName)
-                    result
+                    throw NoTerminatorInStateRunner("state runner end with a call to `con`, `end`, `goTo` or `goStart`")
                 }
             }
         } else {

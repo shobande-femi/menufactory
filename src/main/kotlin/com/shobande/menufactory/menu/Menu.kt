@@ -122,13 +122,19 @@ class Menu(val name: String, val gateway: Gateway = AfricasTalking, val session:
     suspend fun handle(request: Any, responder: suspend (result: Any) -> Any) {
         val transformedRequest = gateway.transform(request)
 
+        session.start(transformedRequest.sessionId)
+
         val previousState = previousState(transformedRequest.sessionId)
 
         val currentState = states[previousState.handler.stateTransitions.nextState(transformedRequest)]
             ?: throw CannotResolveNextState("${previousState.name} state cannot resolve next state for input ${transformedRequest.message}")
 
         val result = currentState.handler.handle(transformedRequest, session)
-        responder(result)
+
+        // it is a final state if the state runner returned an `end`. Then the session for that sessionId is cleared
+        if (result.finalState) session.end(transformedRequest.sessionId)
+
+        responder(result.result)
     }
 
     /**

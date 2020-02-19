@@ -15,17 +15,25 @@ class StateRunner(private val gateway: Gateway) {
      * Sends a response without ending the current user session
      *
      * @param message text to display to the user
+     *
+     * @return @return a [ResultWrapper]. [ResultWrapper.finalState] is set to false to specify that whatever state that calls
+     * this method is not a final state. Hence, session info would be retained.
+     * [ResultWrapper.result] is the actual response.
      */
-    suspend fun con(message: String): Any {
-        return gateway.con(message)
+    suspend fun con(message: String): ResultWrapper {
+        return ResultWrapper(false, gateway.con(message))
     }
 
     /**
      * Sends a response while ending the current user session
      *
      * @param message text to display to the user
+     *
+     * @return a [ResultWrapper]. [ResultWrapper.finalState] is set to true to specify that whatever state that calls
+     * this method is final state. The session info for the current sessionId would be cleared
+     * [ResultWrapper.result] is the actual response.
      */
-    suspend fun end(message: String): Any {
-        return gateway.end(message)
+    suspend fun end(message: String): ResultWrapper {
+        return ResultWrapper(true, gateway.end(message))
     }
 }
