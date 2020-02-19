@@ -201,6 +201,9 @@ by final states.
 Now we are ready to deploy our USSD app.
 Feel free to use what ever mechanism to serve http requests.
 For simplicity, I use Ktor in this example.
+
+Checkout the full Sample app [here](https://github.com/shobande-femi/test-ussd-app)
+
 ```kotlin
 suspend fun main() {
     val menu = buildMenu()
