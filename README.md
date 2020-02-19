@@ -29,7 +29,7 @@ Find the repo password [here](https://drive.google.com/open?id=10yNyLXmrp5iwl8UF
 ## Sample Usage
 ```kotlin
 suspend fun buildMenu(): Menu {
-    return Menu.menu("Mystery App", HubTel) {
+    return Menu.menu("Mystery App", HubTel, InMemorySession()) {
         startState {
             run {
                 con("""Welcome to ${this@menu.name}
@@ -69,8 +69,11 @@ suspend fun buildMenu(): Menu {
                 """.trimMargin())
             }
             transitions {
-                "0" to this@menu.startStateName
-                """^[0-9]*$""" to "airtimeBought"
+                "0" to session.startStateName
+                """^[0-9]*$""" to {
+                    session.set(it.sessionId, "phoneNumber", it.message)
+                    "airtimeBought"
+                }
                 """^[a-zA-Z]*$""" to States.CONTACT_US.name
             }
             defaultNextState(States.CONTACT_US.name)
@@ -84,7 +87,7 @@ suspend fun buildMenu(): Menu {
 
         state("airtimeBought") {
             run {
-                end("You have successfully bought some airtime")
+                end("You have successfully bought some airtime on ${session.get(it.sessionId, "phoneNumber")}")
             }
         }
     }
@@ -104,7 +107,7 @@ You can build your menu as shown above or create a singleton `Menu`,
 the subsequently adding states
 ##### Example
 ```kotlin
-menu = Menu("Mystery App", HubTel)
+menu = Menu("Mystery App", HubTel, InMemorySession())
 
 menu.state("contactUs") {
     run {
@@ -171,6 +174,27 @@ regex as is.
 When user input cannot be matched with any transition definition, the
 state remains the same. You can also define a custom `defaultNextState`
 
+### Sessions
+A `Session` interface exists for defining interactions with whatever
+storage you may use for saving session info. By default, the menu
+used the `InMemorySession`. You may define yours by implementing
+`Session`.
+
+In your implementation, override `startStateName` and set to any value
+of your choice. This will be a reserved state name and any state definition
+(other than `startState`) that tries to use this name will throw 
+a `ReservedStateName` exception.
+
+The key methods to implement are;
+* `start(sessionId: String)`: initializes a new session. Invoked internally
+before any state is run. If there is an active session for the specified
+sessionId, initialization is skipped
+* `set(sessionId: String, key: String, value: Any)`: stores a key-value 
+pair in the current user session
+* `get(sessionId: String, key: String)`: retrieves a value from the current user
+session
+* `end(sessionId: String)`: deletes a user session. Invoked internally
+by final states.
 
 ## Serve Requests
 Now we are ready to deploy our USSD app.

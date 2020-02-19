@@ -29,8 +29,13 @@ class Menu(val name: String, val gateway: Gateway = AfricasTalking, val session:
         /**
          * Menu Factory
          */
-        suspend fun menu(name: String, gateway: Gateway = AfricasTalking, init: suspend Menu.() -> Unit): Menu {
-            val menu = Menu(name, gateway = gateway)
+        suspend fun menu(
+            name: String,
+            gateway: Gateway = AfricasTalking,
+            session: Session = InMemorySession(),
+            init: suspend Menu.() -> Unit
+        ): Menu {
+            val menu = Menu(name, gateway = gateway, session = session)
             menu.init()
             return menu
         }
